@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Bulb Control Panel</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="{{url_for('static',filename = 'img/icon.ico')}}" rel="icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static',filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static',filename = 'css/style.css')}}" rel="stylesheet">
+
+<!-- Internal CSS Section - Mobile Responsive -->
+    <style>
+        .switch-container {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+    
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            background-color: #444; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+    
+        .switch label {
+            font-size: 16px; 
+            white-space: nowrap;
+        }
+    
+        .switch input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+    
+        /*Mobile Responsive*/
+        @media (max-width: 576px) {
+            .switch-container {
+                flex-direction: column;
+                gap: 10px; 
+            }
+    
+            .switch {
+                justify-content: center;
+                width: 100%;
+            }
+    
+            .switch label {
+                font-size: 14px; 
+            }
+    
+            .switch input[type="checkbox"] {
+                transform: scale(1); 
+            }
+            .navbar-brand{display: none;}
+        }
+        .switch-container {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .switch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            text-shadow: 0 0 20px #ff0;
+            color: white;
+            margin-top: 20px;
+        }
+
+        button {
+            width: 100px;
+            height: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .on {
+            background-color: #ff0;
+            box-shadow: 0 0 20px #ff0;
+            color: black;
+            font-weight: bold;
+        }
+
+        .off {
+            background-color: #393833;
+            color: #ff0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-secondary navbar-dark">
+                <a href="" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary">
+                        <img class="rounded-circle" src="{{url_for('static',filename = 'img/logo1.png')}}" alt="" style="width: 50px; height: 50px;">
+                        <span style="text-shadow: 0 0 20px ">Lumos</span>
+                    </h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="{{url_for('static',filename = 'img/logo1.png')}}" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{node_ID}}</h6>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Main Dashboard</a>
+                    <a href="" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Add New Devices</a>
+                    <a href="" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Settings</a>
+                    <a href="{{url_for('logout')}}" class="nav-item nav-link"><i class="fa fa-power-off me-2"></i>SignOut</a>
+                    
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+                <a href="" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0" style="text-shadow: 0 0 20px #ff0;">Lumos</h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars" style="color: #ff0;"></i>
+                </a>
+                <div class="navbar-nav align-items-center ms-auto">
+                   
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Bulb Control Panel -->
+            <center>
+                <h1>Bulb Control Panel</h1>
+                <div class="switch-container">
+                    <div class="switch">
+                        <label>Bulb 1</label>
+                        <button id="bulb1" class="off" onclick="toggleBulb('bulb1')">OFF</button>
+                    </div>
+                    <div class="switch">
+                        <label>Bulb 2</label>
+                        <button id="bulb2" class="off" onclick="toggleBulb('bulb2')">OFF</button>
+                    </div>
+                    <div class="switch">
+                        <label>Bulb 3</label>
+                        <button id="bulb3" class="off" onclick="toggleBulb('bulb3')">OFF</button>
+                    </div>
+                    <div class="switch">
+                        <label>Bulb 4</label>
+                        <button id="bulb4" class="off" onclick="toggleBulb('bulb4')">OFF</button>
+                    </div>
+                    <div class="switch">
+                        <label>Bulb 5</label>
+                        <button id="bulb5" class="off" onclick="toggleBulb('bulb5')">OFF</button>
+                    </div>
+                </div>
+            </center>
+        </div>
+
+
+
+        <script>
+            const nodeID = "{{node_ID}}";
+            // Fetch initial bulb states from the server
+            async function fetchBulbStates() {
+                const response = await fetch(`/api/get_state?node_id=${nodeID}`);
+                const data = await response.json();
+                if (data.bulbs) {
+                    Object.keys(data.bulbs).forEach((bulb) => {
+                        const state = data.bulbs[bulb];
+                        const button = document.getElementById(bulb);
+                        button.innerText = state;
+                        button.className = state === "ON" ? "on" : "off";
+                    });
+                }
+            }
+
+            // Toggle bulb state
+            async function toggleBulb(bulbName) {
+                const button = document.getElementById(bulbName);
+                const newState = button.innerText === "ON" ? "OFF" : "ON";
+                button.innerText = newState;
+                button.className = newState === "ON" ? "on" : "off";
+
+                // Send the new state to the server
+                await fetch('/api/update_bulb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        node_id: nodeID,
+                        bulb_name: bulbName,
+                        bulb_state: newState
+                    })
+                });
+            }
+            // Fetch initial states on page load
+            window.onload = fetchBulbStates;
+        </script>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="{{url_for('static',filename = 'js/main.js')}}"></script>
+</body>
+</html>
