@@ -1,14 +1,22 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoJson.h>
 
 const char* ssid = "Nokia C1 Plus";
 const char* password = "prasad2001";
-const char* serverName = "http://<FLASK_SERVER_IP>:5000/api/get_state";
+const char* serverName = "https://lumos2025.eu.pythonanywhere.com/api/get_state";
 
-const String nodeID = "adminNode"; 
+const String nodeID = "adminNode";
+
+String bulb1;
+String bulb2;
+String bulb3;
+String bulb4;
+String bulb5;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -16,34 +24,60 @@ void setup() {
     Serial.println("Connecting to WiFi...");
   }
   Serial.println("Connected to WiFi");
-  
+
+  // Pin Configuration
+  pinMode(D0, OUTPUT);
   pinMode(D1, OUTPUT);
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
-  pinMode(D5, OUTPUT);
 }
 
 void loop() {
   if (WiFi.status() == WL_CONNECTED) {
+    WiFiClientSecure client;
+    client.setInsecure();
+
     HTTPClient http;
     String url = String(serverName) + "?node_id=" + nodeID;
-    http.begin(url);
+
+    //Serial.println("Requesting URL: " + url);
+    http.begin(client, url);
 
     int httpResponseCode = http.GET();
+
     if (httpResponseCode > 0) {
       String payload = http.getString();
-      Serial.println(payload);
+      //Serial.println("Payload Received: " + payload);
 
-      // Parse JSON response (example code, use ArduinoJson for advanced parsing)
-      if (payload.indexOf("\"bulb1\":\"ON\"") > 0) digitalWrite(D1, HIGH); else digitalWrite(D1, LOW);
-      if (payload.indexOf("\"bulb2\":\"ON\"") > 0) digitalWrite(D2, HIGH); else digitalWrite(D2, LOW);
-      if (payload.indexOf("\"bulb3\":\"ON\"") > 0) digitalWrite(D3, HIGH); else digitalWrite(D3, LOW);
-      if (payload.indexOf("\"bulb4\":\"ON\"") > 0) digitalWrite(D4, HIGH); else digitalWrite(D4, LOW);
-      if (payload.indexOf("\"bulb5\":\"ON\"") > 0) digitalWrite(D5, HIGH); else digitalWrite(D5, LOW);
+      // Decode JSON response
+      StaticJsonDocument<256> doc;
+      DeserializationError error = deserializeJson(doc, payload);
+
+      if (error) {
+        Serial.print("JSON Parsing Error: ");
+        Serial.println(error.c_str());
+      } else {
+        String bulb1 = doc["bulbs"]["bulb1"];
+        String bulb2 = doc["bulbs"]["bulb2"];
+        String bulb3 = doc["bulbs"]["bulb3"];
+        String bulb4 = doc["bulbs"]["bulb4"];
+        String bulb5 = doc["bulbs"]["bulb5"];
+
+        digitalWrite(D0, bulb1 == "ON" ? HIGH : LOW);
+        digitalWrite(D1, bulb2 == "ON" ? HIGH : LOW);
+        digitalWrite(D2, bulb3 == "ON" ? HIGH : LOW);
+        digitalWrite(D3, bulb4 == "ON" ? HIGH : LOW);
+        digitalWrite(D4, bulb5 == "ON" ? HIGH : LOW);  
+      }
+    } else {
+      Serial.print("Error in HTTP request: ");
+      Serial.println(httpResponseCode);
     }
-    http.end();
-  }
 
-  delay(1000);  // Check every second
-} 
+    http.end();
+  } else {
+    Serial.println("WiFi disconnected");
+  }
+  delay(1000);
+}
